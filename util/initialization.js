@@ -20,15 +20,15 @@ const items = [{
     release_date: '2017-11-5',
     category_id: 2
 }];
-// database
-//     .connect()('categories')
-//     .insert(categories)
-//     .then(rows => console.log(rows))
-//     .catch(err => console.log(err));
+database.connect()
+    .insert(categories)
+    .into('categories')
+    .then(rows => console.log(rows))
+    .catch(err => console.log(err));
 
 database
-    .connect()('items')
     .insert(items)
+    .into('items')
     .then(rows => console.log(rows))
     .catch(err => console.log(err));
 
