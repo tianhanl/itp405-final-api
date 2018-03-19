@@ -3,11 +3,15 @@ const credential = require('./credential');
 const knex = require('knex');
 
 const connect = () => knex({
-    clinet: 'mysql',
+    client: 'mysql',
     connection: {
-        host: credential.dbUrl,
-        user: credential.dbUser,
+        host: credential.host,
+        user: credential.user,
         password: credential.pass,
-        database: credential.db
+        database: credential.db,
     }
 });
+
+module.exports = {
+    connect
+};
