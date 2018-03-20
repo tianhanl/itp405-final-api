@@ -48,10 +48,23 @@ const getTransactionsForUser = (user_id, page = 1) => {
         .select('transactions.id', 'users.username', 'items.name as item_name', 'transactions.date', 'transactions.quantity', 'transactions.total')
 };
 
+const postTransaction = (userId, itemId, date, quantity, total) => {
+    return connect()
+        .insert({
+            user_id: userId,
+            item_id: itemId,
+            date,
+            quantity,
+            total
+        })
+        .into('transactions');
+};
+
 module.exports = {
     connect,
     getItems,
     getCategories,
     getTransactions,
-    getTransactionsForUser
+    getTransactionsForUser,
+    postTransaction
 };

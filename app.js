@@ -1,13 +1,15 @@
 const express = require('express');
 const path = require('path');
 const database = require('./util/database');
+const bodyParser = require('body-parser');
 
 const app = express();
 
 app.set('port', process.env.PORT || 3000);
 
 // handle request for static files
-// app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'static')));
+app.use(bodyParser.json());
 
 app.get('/categories', (req, res) => {
     database
@@ -53,6 +55,24 @@ app.get('/transactions', (req, res) => {
         .catch(err => {
             console.log(err);
             next();
+        });
+});
+
+app.post('/transactions', (req, res) => {
+    const userId = req.body.userid;
+    const itemId = req.body.itemid;
+    const date = req.body.date;
+    const quantity = req.body.quantity;
+    const total = req.body.total;
+    database
+        .postTransaction(userId, itemId, date, quantity, total)
+        .then(rows => {
+            res.status(202);
+            res.json(rows);
+        })
+        .catch(err => {
+            res.status(422);
+            res.send(err);
         });
 });
 
