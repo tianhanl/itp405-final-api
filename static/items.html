@@ -12,14 +12,15 @@
 
 <body>
     <div id="app">
-        <form>
-            <input type="number" v-model="userId">
-            <input type="number" v-model="itemId">
-            <input type="date" v-model="date">
-            <input type="number" v-model="quantity">
-
-        </form>
-        <button v-on:click="postData" value="post" />
+        <div id="items-container">
+            <div v-for="item in items" :key="item.id">
+                <img :src="item.imgUrl">
+                <p>{{item.name}}</p>
+                <p>{{item.description}}</p>
+                <p>{{item.price}}</p>
+                <p>{{item.releaseDate}}</p>
+            </div>
+        </div>
         <code>
             Output:
             userId: {{userId}}
@@ -36,29 +37,21 @@
         let app = new Vue({
             el: '#app',
             data: {
-                userId: 1,
-                itemId: 1,
-                date: '',
-                quantity: 0,
-                price: 5
+                items: []
             },
             computed: {
                 total() {
                     return this.quantity * this.price;
                 }
             },
+            created() {
+
+            },
             methods: {
-                postData() {
-                    let self = this;
+                fetchItems() {
                     axios
-                        .post('/transactions', {
-                            userId: self.userId,
-                            itemId: self.itemId,
-                            date: self.date,
-                            quantity: self.quantity,
-                            total: self.total
-                        });
-                    return false;
+                        .get('/items')
+                        .then(rows => this.items = rows);
                 }
             }
         })
