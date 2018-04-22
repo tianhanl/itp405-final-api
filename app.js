@@ -57,6 +57,11 @@ app.get('/transactions', (req, res, next) => {
       next();
     });
 });
+
+app.get('/test', (req, res) => {
+  res.sendFile(path.join(__dirname + '/static/test.html'));
+});
+
 app.post('/transactions', (req, res, next) => {
   console.log(req.body);
   const userId = Number.parseInt(req.body.userId);
@@ -76,8 +81,6 @@ app.post('/transactions', (req, res, next) => {
       res.send(err);
     });
 });
-
-
 
 // catch all requests for not existed routes
 app.use((req, res) => {
