@@ -2,6 +2,15 @@ const express = require('express');
 const path = require('path');
 const database = require('./util/database');
 const bodyParser = require('body-parser');
+const Validator = require('validatorjs');
+
+let itemRules = {
+  name: 'required',
+  price: 'required',
+  description: 'required',
+  release_date: 'required',
+  category_id: 'required'
+};
 
 const app = express();
 
@@ -26,6 +35,31 @@ app.get('/categories', (req, res, next) => {
     });
 });
 
+app.get('/items/:id', (req, res) => {
+  if (!req.params.id) {
+    res.status(400);
+    res.json({
+      message: 'An id must be specified'
+    });
+  } else {
+    database
+      .getItem(req.params.id)
+      .then(rows => {
+        if (!rows || rows.length < 1) {
+          res.status(404);
+          res.send();
+        } else {
+          res.json(rows[0]);
+        }
+      })
+      .catch(e => {
+        console.log(e);
+        res.status(404);
+        res.json(e);
+      });
+  }
+});
+
 app.get('/items', (req, res, next) => {
   database
     .getItems(req.query.page)
@@ -42,6 +76,48 @@ app.get('/items', (req, res, next) => {
     });
 });
 
+app.post('/items', (req, res) => {
+  let validation = new Validator(req.body, itemRules);
+  if (validation.passes()) {
+    console.log(req.body);
+    database
+      .postItem(req.body)
+      .then(rows => {
+        console.log(rows);
+        res.status(202);
+        res.send();
+      })
+      .catch(e => {
+        console.log(e);
+        res.status(422);
+        res.json(e);
+      });
+  } else {
+    res.status(422);
+    res.json(validation.errors);
+  }
+});
+
+app.patch('/items/:id', (req, res) => {
+  let validation = new Validator(req.body, itemRules);
+  if (validation.passes()) {
+    database
+      .updateItem(req.params.id, req.body)
+      .then(rows => {
+        console.log(rows);
+        res.json(rows);
+      })
+      .catch(e => {
+        console.log(e);
+        res.status(422);
+        res.json(e);
+      });
+  } else {
+    res.status(422);
+    res.json(validation.errors);
+  }
+});
+
 app.get('/transactions', (req, res, next) => {
   database
     .getTransactions(req.query.page)
@@ -56,10 +132,6 @@ app.get('/transactions', (req, res, next) => {
       console.log(err);
       next();
     });
-});
-
-app.get('/test', (req, res) => {
-  res.sendFile(path.join(__dirname + '/static/test.html'));
 });
 
 app.post('/transactions', (req, res, next) => {
